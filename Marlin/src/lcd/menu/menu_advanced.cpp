@@ -102,6 +102,7 @@ void menu_backlash();
   // Advanced Settings > Filament
   //
   void menu_advanced_filament() {
+    const bool busy = printer_busy();
     START_MENU();
     BACK_ITEM(MSG_ADVANCED_SETTINGS);
 
@@ -155,6 +156,10 @@ void menu_backlash();
       EDIT_ITEM_FAST(float3, MSG_RUNOUT_DISTANCE_MM, &editable.decimal, 1, 999,
         []{ runout.set_runout_distance(editable.decimal); }, true
       );
+    #endif
+
+    #if HAS_FILAMENT_STATE
+      if (!busy)  EDIT_ITEM(bool, MSG_RUNOUT_STATE, &runout.state, runout.reset);
     #endif
 
     END_MENU();
@@ -497,16 +502,18 @@ void menu_backlash();
   #if HAS_BED_PROBE
     void menu_probe_offsets() {
       START_MENU();
+
       BACK_ITEM(MSG_ADVANCED_SETTINGS);
+
+      #if ENABLED(PROBE_OFFSET_WIZARD)
+        SUBMENU(MSG_PROBE_WIZARD, goto_probe_offset_wizard);
+      #endif
+      
       #if HAS_PROBE_XY_OFFSET
         EDIT_ITEM(float31sign, MSG_ZPROBE_XOFFSET, &probe.offset.x, -(X_BED_SIZE), X_BED_SIZE);
         EDIT_ITEM(float31sign, MSG_ZPROBE_YOFFSET, &probe.offset.y, -(Y_BED_SIZE), Y_BED_SIZE);
       #endif
       EDIT_ITEM(LCD_Z_OFFSET_TYPE, MSG_ZPROBE_ZOFFSET, &probe.offset.z, Z_PROBE_OFFSET_RANGE_MIN, Z_PROBE_OFFSET_RANGE_MAX);
-
-      #if ENABLED(PROBE_OFFSET_WIZARD)
-        SUBMENU(MSG_PROBE_WIZARD, goto_probe_offset_wizard);
-      #endif
 
       #if ENABLED(X_AXIS_TWIST_COMPENSATION)
         SUBMENU(MSG_XATC, xatc_wizard_continue);
@@ -517,6 +524,42 @@ void menu_backlash();
   #endif
 
 #endif // !SLIM_LCD_MENUS
+
+#if E_STEPPERS // preset menu for extruders
+#include "../../gcode/gcode.h"
+  void menu_extruder_preset() {
+    START_MENU();
+    BACK_ITEM(MSG_STEPS_PER_MM);
+    //ACTION_ITEM_P(PSTR("Stock Extruder"), []{ gcode.process_subcommands_now(F("M92E93")); ui.goto_previous_screen(); });
+    //ACTION_ITEM_P(PSTR("Dual-Gear Extruder"), []{ gcode.process_subcommands_now(F("M92E140")); ui.goto_previous_screen(); });
+    //ACTION_ITEM_P(PSTR("E3D Titan Extruder"), []{ gcode.process_subcommands_now(F("M92E410")); ui.goto_previous_screen(); });
+    //ACTION_ITEM_P(PSTR("BMG Extruder"), []{ gcode.process_subcommands_now(F("M92E415")); ui.goto_previous_screen(); });
+    CONFIRM_ITEM_P(PSTR("Stock Extruder"),
+      MSG_BUTTON_NEXT, MSG_BUTTON_BACK,
+      []{gcode.process_subcommands_now(F("M92E93M500")); ui.goto_previous_screen(); ui.goto_previous_screen();}, ui.goto_previous_screen,
+      GET_TEXT(MSG_E_STEPS), PSTR("Will be set to 93"), PSTR("For Stock Extruder")
+    );
+
+    CONFIRM_ITEM_P(PSTR("Dual-Gear Extruder"),
+      MSG_BUTTON_NEXT, MSG_BUTTON_BACK,
+      []{gcode.process_subcommands_now(F("M92E140M500")); ui.goto_previous_screen(); ui.goto_previous_screen();}, ui.goto_previous_screen,
+      GET_TEXT(MSG_E_STEPS), PSTR("Will be set to 140"), PSTR("For Dual-Gear Extruder")
+    );
+
+    CONFIRM_ITEM_P(PSTR("E3D Titan Extruder"),
+      MSG_BUTTON_NEXT, MSG_BUTTON_BACK,
+      []{gcode.process_subcommands_now(F("M92E410M500")); ui.goto_previous_screen(); ui.goto_previous_screen();}, ui.goto_previous_screen,
+      GET_TEXT(MSG_E_STEPS), PSTR("Will be set to 410"), PSTR("For E3D Titan Extruder")
+    );
+
+    CONFIRM_ITEM_P(PSTR("BMG Extruder"),
+      MSG_BUTTON_NEXT, MSG_BUTTON_BACK,
+      []{gcode.process_subcommands_now(F("M92E415M500")); ui.goto_previous_screen(); ui.goto_previous_screen();}, ui.goto_previous_screen,
+      GET_TEXT(MSG_E_STEPS), PSTR("Will be set to 415"), PSTR("For BMG Extruder")
+    );
+    END_MENU();
+  }
+#endif
 
 // M92 Steps-per-mm
 void menu_advanced_steps_per_mm() {
@@ -540,13 +583,14 @@ void menu_advanced_steps_per_mm() {
       });
   #elif E_STEPPERS
     EDIT_ITEM_FAST(float51, MSG_E_STEPS, &planner.settings.axis_steps_per_mm[E_AXIS], 5, 9999, []{ planner.refresh_positioning(); });
+    SUBMENU_P(PSTR("Extruder Preset"), menu_extruder_preset);
   #endif
 
   END_MENU();
 }
 
 void menu_advanced_settings() {
-  const bool is_busy = printer_busy();
+  const bool busy = printer_busy();
 
   #if ENABLED(SD_FIRMWARE_UPDATE)
     bool sd_update_state = settings.sd_update_status();
@@ -561,7 +605,7 @@ void menu_advanced_settings() {
       //
       // Set Home Offsets
       //
-      ACTION_ITEM(MSG_SET_HOME_OFFSETS, []{ queue.inject(F("M428")); ui.return_to_status(); });
+      //ACTION_ITEM(MSG_SET_HOME_OFFSETS, []{ queue.inject(F("M428")); ui.return_to_status(); });
     #endif
 
     // M203 / M205 - Feedrate items
@@ -581,14 +625,13 @@ void menu_advanced_settings() {
 
     // M851 - Z Probe Offsets
     #if HAS_BED_PROBE
-      if (!is_busy) SUBMENU(MSG_ZPROBE_OFFSETS, menu_probe_offsets);
+      if (!busy) SUBMENU(MSG_ZPROBE_OFFSETS, menu_probe_offsets);
     #endif
 
   #endif // !SLIM_LCD_MENUS
 
   // M92 - Steps Per mm
-  if (!is_busy)
-    SUBMENU(MSG_STEPS_PER_MM, menu_advanced_steps_per_mm);
+  if (!busy) SUBMENU(MSG_STEPS_PER_MM, menu_advanced_steps_per_mm);
 
   #if ENABLED(BACKLASH_GCODE)
     SUBMENU(MSG_BACKLASH, menu_backlash);
@@ -606,7 +649,7 @@ void menu_advanced_settings() {
   #endif
 
   #if SHOW_MENU_ADVANCED_TEMPERATURE
-    SUBMENU(MSG_TEMPERATURE, menu_advanced_temperature);
+    if (!busy) SUBMENU(MSG_TEMPERATURE, menu_advanced_temperature);
   #endif
 
   #if DISABLED(NO_VOLUMETRICS) || ENABLED(ADVANCED_PAUSE_FEATURE)
@@ -643,7 +686,7 @@ void menu_advanced_settings() {
   #endif
 
   #if ENABLED(EEPROM_SETTINGS) && DISABLED(SLIM_LCD_MENUS)
-    CONFIRM_ITEM(MSG_INIT_EEPROM,
+    if (!busy) CONFIRM_ITEM(MSG_INIT_EEPROM,
       MSG_BUTTON_INIT, MSG_BUTTON_CANCEL,
       ui.init_eeprom, nullptr,
       GET_TEXT(MSG_INIT_EEPROM), (const char *)nullptr, PSTR("?")

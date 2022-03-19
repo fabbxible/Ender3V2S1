@@ -239,6 +239,25 @@ void menu_move() {
     EDIT_ITEM(bool, MSG_LCD_SOFT_ENDSTOPS, &soft_endstop._enabled);
   #endif
 
+  #if 0
+    ACTION_ITEM(MSG_MOVE_X, [] { 
+      EDIT_ITEM_FAST(float41sign, MSG_MOVE_X, &current_position.x, X_MIN_POS, X_MAX_POS);   
+      if (!planner.is_full()) {
+        planner.synchronize(); 
+        });
+    }
+
+    #if HAS_Y_AXIS
+      EDIT_ITEM_FAST(float41sign, MSG_MOVE_Y, &current_position.y, Y_MIN_POS, Z_MAX_POS);
+    #endif
+    #if HAS_Z_AXIS
+      EDIT_ITEM_FAST(float41sign, MSG_MOVE_Z, &current_position.x, Z_MIN_POS, Z_MAX_POS);
+    #endif
+    #if E_MANUAL
+      EDIT_ITEM_FAST(float41sign, MSG_MOVE_E, &current_position.e, -999.9, +999.9);
+    #endif
+  #endif
+
   if (NONE(IS_KINEMATIC, NO_MOTION_BEFORE_HOMING) || all_axes_homed()) {
     if (TERN1(DELTA, current_position.z <= delta_clip_start_height)) {
       SUBMENU(MSG_MOVE_X, []{ _menu_move_distance(X_AXIS, lcd_move_x); });
@@ -337,7 +356,7 @@ void menu_move() {
     START_MENU();
     BACK_ITEM(MSG_MOTION);
 
-    GCODES_ITEM(MSG_AUTO_HOME, G28_STR);
+    GCODES_ITEM(MSG_AUTO_HOME, PSTR("G28\nG0Z10"));
     GCODES_ITEM_N(X_AXIS, MSG_AUTO_HOME_A, PSTR("G28X"));
     #if HAS_Y_AXIS
       GCODES_ITEM_N(Y_AXIS, MSG_AUTO_HOME_A, PSTR("G28Y"));
@@ -465,9 +484,11 @@ void menu_motion() {
     SUBMENU(MSG_BED_TRAMMING, _lcd_level_bed_corners);
   #endif
 
-  #if ENABLED(Z_MIN_PROBE_REPEATABILITY_TEST)
-    GCODES_ITEM(MSG_M48_TEST, PSTR("G28O\nM48 P10"));
-  #endif
+  ////  M48 moved to bltouch menu
+  // #if ENABLED(Z_MIN_PROBE_REPEATABILITY_TEST)
+  //   //GCODES_ITEM(MSG_M48_TEST, PSTR("G28O\nM48 P10"));
+  //   ACTION_ITEM(MSG_M48_TEST, []{ queue.inject(F("G28O\nM48 P10")); ui.return_to_status(); });
+  // #endif
 
   //
   // Disable Steppers

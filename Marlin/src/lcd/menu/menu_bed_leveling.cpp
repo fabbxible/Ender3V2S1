@@ -243,20 +243,16 @@ void menu_bed_leveling() {
 
   // Auto Home if not using manual probing
   #if NONE(PROBE_MANUALLY, MESH_BED_LEVELING)
-    if (!is_homed) GCODES_ITEM(MSG_AUTO_HOME, G28_STR);
+    //if (!is_homed) GCODES_ITEM(MSG_AUTO_HOME, PSTR("G28\nZ10"));
   #endif
 
   // Level Bed
   #if EITHER(PROBE_MANUALLY, MESH_BED_LEVELING)
     // Manual leveling uses a guided procedure
-    SUBMENU(MSG_LEVEL_BED, _lcd_level_bed_continue);
+    SUBMENU(MSG_MANUAL_MESH, _lcd_level_bed_continue);
   #else
     // Automatic leveling can just run the G-code
-    GCODES_ITEM(MSG_LEVEL_BED, is_homed ? PSTR("G29") : PSTR("G29N"));
-  #endif
-
-  #if ENABLED(MESH_EDIT_MENU)
-    if (is_valid) SUBMENU(MSG_EDIT_MESH, menu_edit_mesh);
+    GCODES_ITEM(MSG_AUTO_MESH, is_homed ? PSTR("G29") : PSTR("G29N"));
   #endif
 
   // Homed and leveling is valid? Then leveling can be toggled.
@@ -264,6 +260,14 @@ void menu_bed_leveling() {
     bool show_state = planner.leveling_active;
     EDIT_ITEM(bool, MSG_BED_LEVELING, &show_state, _lcd_toggle_bed_leveling);
   }
+
+  #if ENABLED(MESH_EDIT_MENU)
+    if (is_valid) SUBMENU(MSG_EDIT_MESH, menu_edit_mesh);
+  #endif
+
+  #if ENABLED(LEVEL_BED_CORNERS)
+    SUBMENU(MSG_BED_TRAMMING, _lcd_level_bed_corners);
+  #endif
 
   // Z Fade Height
   #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
@@ -277,21 +281,17 @@ void menu_bed_leveling() {
   //
   #if ENABLED(MESH_BED_LEVELING)
     #if WITHIN(Z_PROBE_OFFSET_RANGE_MIN, -9, 9)
-      #define LCD_Z_OFFSET_TYPE float43    // Values from -9.000 to +9.000
+      #define LCD_Z_OFFSET_TYPE float32    // Values from -9.000 to +9.000
     #else
       #define LCD_Z_OFFSET_TYPE float42_52 // Values from -99.99 to 99.99
     #endif
-    EDIT_ITEM(LCD_Z_OFFSET_TYPE, MSG_BED_Z, &mbl.z_offset, Z_PROBE_OFFSET_RANGE_MIN, Z_PROBE_OFFSET_RANGE_MAX);
+    //EDIT_ITEM(LCD_Z_OFFSET_TYPE, MSG_BED_Z, &mbl.z_offset, Z_PROBE_OFFSET_RANGE_MIN, Z_PROBE_OFFSET_RANGE_MAX); //Disabled to reduce user confusion
   #endif
 
   #if ENABLED(BABYSTEP_ZPROBE_OFFSET)
-    SUBMENU(MSG_ZPROBE_ZOFFSET, lcd_babystep_zoffset);
+    //SUBMENU(MSG_ZPROBE_ZOFFSET, lcd_babystep_zoffset); //Disable to reduce user confusion
   #elif HAS_BED_PROBE
-    EDIT_ITEM(LCD_Z_OFFSET_TYPE, MSG_ZPROBE_ZOFFSET, &probe.offset.z, Z_PROBE_OFFSET_RANGE_MIN, Z_PROBE_OFFSET_RANGE_MAX);
-  #endif
-
-  #if ENABLED(LEVEL_BED_CORNERS)
-    SUBMENU(MSG_BED_TRAMMING, _lcd_level_bed_corners);
+    //EDIT_ITEM(LCD_Z_OFFSET_TYPE, MSG_ZPROBE_ZOFFSET, &probe.offset.z, Z_PROBE_OFFSET_RANGE_MIN, Z_PROBE_OFFSET_RANGE_MAX); //Disable to reduce user confusion
   #endif
 
   #if ENABLED(EEPROM_SETTINGS)

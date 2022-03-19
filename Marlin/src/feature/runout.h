@@ -67,6 +67,10 @@ class FilamentMonitorBase {
   public:
     static bool enabled, filament_ran_out;
 
+    #if HAS_FILAMENT_STATE
+      static bool state;
+    #endif
+
     #if ENABLED(HOST_ACTION_COMMANDS)
       static bool host_handling;
     #else
@@ -114,7 +118,7 @@ class TFilamentMonitor : public FilamentMonitorBase {
     }
 
     // Give the response a chance to update its counter.
-    static inline void run() {
+    void run() {
       if (enabled && !filament_ran_out && (printingIsActive() || did_pause_print)) {
         TERN_(HAS_FILAMENT_RUNOUT_DISTANCE, cli()); // Prevent RunoutResponseDelayed::block_completed from accumulating here
         response.run();
@@ -308,10 +312,16 @@ class FilamentSensorBase {
 
     public:
       static inline void block_completed(const block_t * const) {}
-
-      static inline void run() {
+      //static inline void run() {run (runout.state);}
+      void run() {
         LOOP_L_N(s, NUM_RUNOUT_SENSORS) {
-          const bool out = poll_runout_state(s);
+          #if HAS_FILAMENT_STATE
+            bool out = poll_runout_state(s);
+            if(runout.state != FIL_RUNOUT_STATE) out = !out;
+          #else
+            const bool out = poll_runout_state(s);
+          #endif
+
           if (!out) filament_present(s);
           #if ENABLED(FILAMENT_RUNOUT_SENSOR_DEBUG)
             static uint8_t was_out; // = 0

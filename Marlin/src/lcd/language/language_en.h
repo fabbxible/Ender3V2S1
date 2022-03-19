@@ -357,7 +357,7 @@ namespace Language_en {
   LSTR MSG_VK_JERK                        = _UxGT("Max ") LCD_STR_K _UxGT(" Jerk");
   LSTR MSG_VE_JERK                        = _UxGT("Max E Jerk");
   LSTR MSG_JUNCTION_DEVIATION             = _UxGT("Junction Dev");
-  LSTR MSG_VELOCITY                       = _UxGT("Velocity");
+  LSTR MSG_VELOCITY                       = _UxGT("Velocity (mm/s)");
   LSTR MSG_VMAX_A                         = _UxGT("Max ") LCD_STR_A _UxGT(" Vel");
   LSTR MSG_VMAX_B                         = _UxGT("Max ") LCD_STR_B _UxGT(" Vel");
   LSTR MSG_VMAX_C                         = _UxGT("Max ") LCD_STR_C _UxGT(" Vel");
@@ -368,7 +368,7 @@ namespace Language_en {
   LSTR MSG_VMAX_EN                        = _UxGT("Max * Vel");
   LSTR MSG_VMIN                           = _UxGT("Min Velocity");
   LSTR MSG_VTRAV_MIN                      = _UxGT("Min Travel Vel");
-  LSTR MSG_ACCELERATION                   = _UxGT("Acceleration");
+  LSTR MSG_ACCELERATION                   = _UxGT("Acceleration"); 
   LSTR MSG_AMAX_A                         = _UxGT("Max ") LCD_STR_A _UxGT(" Accel");
   LSTR MSG_AMAX_B                         = _UxGT("Max ") LCD_STR_B _UxGT(" Accel");
   LSTR MSG_AMAX_C                         = _UxGT("Max ") LCD_STR_C _UxGT(" Accel");
@@ -640,6 +640,7 @@ namespace Language_en {
   LSTR MSG_RUNOUT_SENSOR                  = _UxGT("Runout Sensor");
   LSTR MSG_RUNOUT_DISTANCE_MM             = _UxGT("Runout Dist mm");
   LSTR MSG_RUNOUT_ENABLE                  = _UxGT("Enable Runout");
+  LSTR MSG_RUNOUT_STATE                   = _UxGT("Runout Sig. Inv.");
   LSTR MSG_FANCHECK                       = _UxGT("Fan Tacho Check");
   LSTR MSG_KILL_HOMING_FAILED             = _UxGT("Homing Failed");
   LSTR MSG_LCD_PROBING_FAILED             = _UxGT("Probing Failed");

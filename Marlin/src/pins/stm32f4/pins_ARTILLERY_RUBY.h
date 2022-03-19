@@ -60,6 +60,8 @@
   #define Z_MAX_PIN                         PC2
 #endif
 
+#define Z_MIN_PROBE_PIN                     PC2
+
 //
 // Steppers
 //
@@ -179,4 +181,17 @@
   #define BTN_EN1                           PB4
   #define BTN_EN2                           PB3
   #define BTN_ENC                           PC14
+#endif
+
+#if HAS_TRINAMIC_CONFIG
+#define X_SERIAL_RX_PIN  PC10
+#define X_SERIAL_TX_PIN  PC10
+#define Y_SERIAL_RX_PIN  PC11
+#define Y_SERIAL_TX_PIN  PC11
+#define Z_SERIAL_RX_PIN  PB4
+#define Z_SERIAL_TX_PIN  PB4
+#define E0_SERIAL_RX_PIN PB3
+#define E0_SERIAL_TX_PIN PB3
+#define E1_SERIAL_RX_PIN PD2
+#define E1_SERIAL_TX_PIN PD2
 #endif

@@ -60,8 +60,7 @@
   #define DEF_GRID_MAX_POINTS 5
   #define GRID_LIMIT 9
 #endif
-
-//#define HAS_GCODE_PREVIEW 1
+#define HAS_GCODE_PREVIEW 1
 #define HAS_ESDIAG 1
 #ifndef INDIVIDUAL_AXIS_HOMING_SUBMENU
   #define INDIVIDUAL_AXIS_HOMING_SUBMENU
@@ -78,7 +77,7 @@
 #ifndef HAS_LCD_BRIGHTNESS
   #define HAS_LCD_BRIGHTNESS 1
 #endif
-#define DEFAULT_LCD_BRIGHTNESS 127
+#define DEFAULT_LCD_BRIGHTNESS 64
 
 typedef struct {
 // Color settings
@@ -108,7 +107,7 @@ typedef struct {
     int16_t BedPidT = PREHEAT_1_TEMP_BED;
   #endif
   #if ANY(HAS_HOTEND, HAS_HEATED_BED)
-    int16_t PidCycles = 10;
+    int16_t PidCycles = 8;
   #endif
   #if ENABLED(PREVENT_COLD_EXTRUSION)
     int16_t ExtMinT = EXTRUDE_MINTEMP;

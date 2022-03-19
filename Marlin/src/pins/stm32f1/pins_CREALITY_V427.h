@@ -26,8 +26,9 @@
  */
 
 #define BOARD_INFO_NAME      "Creality v4.2.7"
-#define DEFAULT_MACHINE_NAME "Creality3D"
-
+#ifndef DEFAULT_MACHINE_NAME
+    #define DEFAULT_MACHINE_NAME "TMC2225 Driver"
+#endif
 //
 // Steppers
 //

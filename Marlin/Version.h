@@ -28,36 +28,87 @@
 /**
  * Marlin release version identifier
  */
-#define SHORT_BUILD_VERSION "2.0.9.4 MRiscoC"
+#if ENABLED(ENDER3)
+    #define var0 "Ender-3 Evo"
+    #define var1 "e3"
+#elif ENABLED(ENDER3MAX)
+    #define var0 "Ender-3 Max"
+    #define var1 "e3m"
+#elif ENABLED(ENDER3V2)
+    #define var0 "Ender-3 V2"
+    #define var1 "e3v2"
+#elif ENABLED(ENDER3S1)
+    #define var0 "Ender-3 S1"
+    #define var1 "e3s1"
+#elif ENABLED(ENDER5)
+    #define var0 "Ender-5 Evo"
+    #define var1 "e5"
+#elif ENABLED(ENDER2)
+    #define var0 "Ender-2 Evo"
+    #define var1 "e2"
+#else
+    #error "unknown machine selected."
+#endif
 
+#if MOTHERBOARD == BOARD_CREALITY_V4
+    #define var2 "_422"
+#elif MOTHERBOARD == BOARD_CREALITY_V427
+    #define var2 "_427"
+#elif MOTHERBOARD == BOARD_CREALITY_V423
+    #define var2 "_423"
+#else
+    #error "unknown mainboard used."
+#endif
+
+#if ENABLED(BL)
+    #define var3 "bl"
+#else
+    #define var3 ""
+#endif
+
+#if ENABLED(TI)
+    #define var4 "ti"
+#elif ENABLED(DG)
+    #define var4 "dg"
+#else
+    #define var4 ""
+#endif
+
+#if ENABLED(AM)
+    #define var5 "ht"
+#else
+    #define var5 ""
+#endif
+
+#define SHORT_BUILD_VERSION var1 var2 var3 var4 var5
 /**
  * Verbose version identifier which should contain a reference to the location
  * from where the binary was downloaded or the source code was compiled.
  */
-#define DETAILED_BUILD_VERSION SHORT_BUILD_VERSION " 422 ManualMesh, based on bugfix-2.0.x"
+#define DETAILED_BUILD_VERSION SHORT_BUILD_VERSION "-Marlin 2.0.9.2"
 
 /**
  * The STRING_DISTRIBUTION_DATE represents when the binary file was built,
  * here we define this default string as the date where the latest release
  * version was tagged.
  */
-//#define STRING_DISTRIBUTION_DATE "2021-12-23"
-
 #define STRING_DISTRIBUTION_DATE __DATE__
-#define STRING_DISTRIBUTION_TIME __TIME__
+
+//#define STRING_DISTRIBUTION_DATE __DATE__
+//#define STRING_DISTRIBUTION_TIME __TIME__
 
 /**
  * Defines a generic printer name to be output to the LCD after booting Marlin.
  */
-#define MACHINE_NAME "Ender 3v2"
-
+#define DEFAULT_MACHINE_NAME var0
+//#define MACHINE_NAME
 /**
  * The SOURCE_CODE_URL is the location where users will find the Marlin Source
  * Code which is installed on the device. In most cases —unless the manufacturer
  * has a distinct Github fork— the Source Code URL should just be the main
  * Marlin repository.
  */
-#define SOURCE_CODE_URL "github.com/mriscoc/Marlin_Ender3v2"
+#define SOURCE_CODE_URL "fabbxible@gmail.com"
 
 /**
  * Default generic printer UUID.
@@ -68,7 +119,7 @@
  * The WEBSITE_URL is the location where users can get more information such as
  * documentation about a specific Marlin release.
  */
-#define WEBSITE_URL "github.com/mriscoc/Marlin_Ender3v2/wiki"
+#define WEBSITE_URL SOURCE_CODE_URL
 
 /**
  * Set the vendor info the serial USB interface, if changable

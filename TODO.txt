@@ -1,0 +1,11 @@
+TODO
+1. Filament Runout Trigger Level Switch (e3v2 and LCD) (e3v2 added)
+2. Auto-Retract Switch (e3v2) (added)
+3. simplify LCD move menu (added)
+4. e3v2 change purge menu button label to Purge/Continue from Confirm/Continue (put aside)
+5. e3v2 change fan speed from 8bit value to %
+6. e3v2 add self-test to bltouch submenu (added)
+7. e3v2 add bltouch HS mode to bltouch submenu (added)
+8. e3v2 add printing acceleration menu
+9. e3v2 add preheat submenu
+10. editable max temp (lcd added)

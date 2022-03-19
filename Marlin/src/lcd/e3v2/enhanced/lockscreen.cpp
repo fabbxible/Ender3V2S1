@@ -48,6 +48,8 @@ void LockScreenClass::draw() {
   DWINUI::Draw_CenteredString(Color_White, 180, F("Printer is Locked,"));
   DWINUI::Draw_CenteredString(Color_White, 200, F("Scroll to unlock."));
   DWINUI::Draw_CenteredString(Color_White, 240, F("-> | <-"));
+  DWINUI::Draw_CenteredString(Color_White, 300, F(DETAILED_BUILD_VERSION));
+  DWINUI::Draw_CenteredString(Color_White, 320, F(STRING_DISTRIBUTION_DATE));
   DWIN_Draw_Box(1, HMI_data.Barfill_Color, 0, 260, DWIN_WIDTH, 20);
   DWIN_Draw_VLine(Color_Yellow, lock_pos * DWIN_WIDTH / 255, 260, 20);
   DWIN_UpdateLCD();

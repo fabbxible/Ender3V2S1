@@ -251,11 +251,15 @@ void menu_info_board() {
   void menu_info_printer() {
     if (ui.use_click()) return ui.go_back();
     START_SCREEN();
+    #if ENABLED(PRE)
+      STATIC_ITEM_P(PSTR("PRELIMINARY FIRMWARE! Use with Cautions."));
+    #endif
     STATIC_ITEM(MSG_MARLIN, SS_DEFAULT|SS_INVERT);              // Marlin
     STATIC_ITEM_P(PSTR(SHORT_BUILD_VERSION));                   // x.x.x-Branch
     STATIC_ITEM_P(PSTR(STRING_DISTRIBUTION_DATE));              // YYYY-MM-DD HH:MM
     STATIC_ITEM_P(PSTR(MACHINE_NAME), SS_DEFAULT|SS_INVERT);    // My3DPrinter
     STATIC_ITEM_P(PSTR(WEBSITE_URL));                           // www.my3dprinter.com
+    STATIC_ITEM_P(PSTR("Fabbxible Edition"));
     PSTRING_ITEM(MSG_INFO_EXTRUDERS, STRINGIFY(EXTRUDERS), SS_CENTER); // Extruders: 2
     #if HAS_LEVELING
       STATIC_ITEM(
@@ -265,6 +269,18 @@ void menu_info_board() {
         TERN_(AUTO_BED_LEVELING_UBL, MSG_UBL_LEVELING)            // Unified Bed Leveling
         TERN_(MESH_BED_LEVELING, MSG_MESH_LEVELING)               // Mesh Leveling
       );
+
+    #endif
+    #if ENABLED(BL)
+      STATIC_ITEM(MSG_BLTOUCH);
+    #endif
+
+    #if ENABLED(TI)
+      STATIC_ITEM_P(PSTR("Direct Extruder"));
+    #endif
+
+    #if ENABLED(AM)
+      STATIC_ITEM_P(PSTR("High Temp. Hotend"));
     #endif
     END_SCREEN();
   }
@@ -294,7 +310,7 @@ void menu_info() {
   #if HAS_GAMES
   {
     #if ENABLED(GAMES_EASTER_EGG)
-      SKIP_ITEM(); SKIP_ITEM(); SKIP_ITEM();
+      SKIP_ITEM(); SKIP_ITEM(); SKIP_ITEM(); SKIP_ITEM(); SKIP_ITEM();
     #endif
 
     // Game sub-menu or the individual game
@@ -312,6 +328,15 @@ void menu_info() {
       #endif
     );
   }
+  #endif
+
+  #if ENABLED(EDITABLE_MAXTEMP)
+    static celsius_t _temperature = thermalManager.hotend_max_target(0);
+    //EDIT_ITEM_P(int3, PSTR("Max Temp:"), &thermalManager.hotend_maxtemp[0], 275, 350, []{});
+    EDIT_ITEM_P(int3, PSTR("Max Temp:"), &_temperature, 260, 350, []{thermalManager.hotend_maxtemp[0] = _temperature + HOTEND_OVERSHOOT;});
+    #if HAS_MULTIPLE_HOTEND
+      #error "multiple editable hotend max temperature is not supported"
+    #endif
   #endif
 
   END_MENU();

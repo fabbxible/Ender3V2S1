@@ -26,8 +26,9 @@
  */
 
 #define BOARD_INFO_NAME      "Creality v2.4.S1 V101"
-#define DEFAULT_MACHINE_NAME "Creality3D"
-
+#ifndef DEFAULT_MACHINE_NAME
+    #define DEFAULT_MACHINE_NAME "Ender-7"
+#endif
 //
 // Heaters
 //

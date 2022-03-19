@@ -239,11 +239,18 @@ void menu_advanced_settings();
     ACTION_ITEM(MSG_BLTOUCH_SELFTEST, bltouch._selftest);
     ACTION_ITEM(MSG_BLTOUCH_DEPLOY, bltouch._deploy);
     ACTION_ITEM(MSG_BLTOUCH_STOW, bltouch._stow);
-    ACTION_ITEM(MSG_BLTOUCH_SW_MODE, bltouch._set_SW_mode);
+    //ACTION_ITEM(MSG_BLTOUCH_SW_MODE, bltouch._set_SW_mode);
     #ifdef BLTOUCH_HS_MODE
       EDIT_ITEM(bool, MSG_BLTOUCH_SPEED_MODE, &bltouch.high_speed_mode);
     #endif
+
+    #if ENABLED(Z_MIN_PROBE_REPEATABILITY_TEST)
+      //GCODES_ITEM(MSG_M48_TEST, PSTR("G28O\nM48 P10"));
+      ACTION_ITEM(MSG_M48_TEST, []{ queue.inject(F("G28O\nM48 P10")); ui.return_to_status(); });
+    #endif
+    
     #if ENABLED(BLTOUCH_LCD_VOLTAGE_MENU)
+      ACTION_ITEM(MSG_BLTOUCH_SW_MODE, bltouch._set_SW_mode);
       CONFIRM_ITEM(MSG_BLTOUCH_5V_MODE, MSG_BLTOUCH_5V_MODE, MSG_BUTTON_CANCEL, bltouch._set_5V_mode, nullptr, GET_TEXT(MSG_BLTOUCH_MODE_CHANGE));
       CONFIRM_ITEM(MSG_BLTOUCH_OD_MODE, MSG_BLTOUCH_OD_MODE, MSG_BUTTON_CANCEL, bltouch._set_OD_mode, nullptr, GET_TEXT(MSG_BLTOUCH_MODE_CHANGE));
       ACTION_ITEM(MSG_BLTOUCH_MODE_STORE, bltouch._mode_store);
@@ -299,26 +306,65 @@ void menu_advanced_settings();
     #if ENABLED(FWRETRACT_AUTORETRACT)
       EDIT_ITEM(bool, MSG_AUTORETRACT, &fwretract.autoretract_enabled, fwretract.refresh_autoretract);
     #endif
-    EDIT_ITEM(float52sign, MSG_CONTROL_RETRACT, &fwretract.settings.retract_length, 0, 100);
+    EDIT_ITEM(float41sign, MSG_CONTROL_RETRACT, &fwretract.settings.retract_length, 0, 99);
     #if HAS_MULTI_EXTRUDER
-      EDIT_ITEM(float52sign, MSG_CONTROL_RETRACT_SWAP, &fwretract.settings.swap_retract_length, 0, 100);
+      EDIT_ITEM(float41sign, MSG_CONTROL_RETRACT_SWAP, &fwretract.settings.swap_retract_length, 0, 99);
     #endif
-    EDIT_ITEM(float3, MSG_CONTROL_RETRACTF, &fwretract.settings.retract_feedrate_mm_s, 1, 999);
-    EDIT_ITEM(float52sign, MSG_CONTROL_RETRACT_ZHOP, &fwretract.settings.retract_zraise, 0, 999);
-    EDIT_ITEM(float52sign, MSG_CONTROL_RETRACT_RECOVER, &fwretract.settings.retract_recover_extra, -100, 100);
+    EDIT_ITEM(float3, MSG_CONTROL_RETRACTF, &fwretract.settings.retract_feedrate_mm_s, 1, 100);
+    EDIT_ITEM(float41sign, MSG_CONTROL_RETRACT_ZHOP, &fwretract.settings.retract_zraise, 0, 99);
+    EDIT_ITEM(float41sign, MSG_CONTROL_RETRACT_RECOVER, &fwretract.settings.retract_recover_extra, -99, 99);
     #if HAS_MULTI_EXTRUDER
-      EDIT_ITEM(float52sign, MSG_CONTROL_RETRACT_RECOVER_SWAP, &fwretract.settings.swap_retract_recover_extra, -100, 100);
+      EDIT_ITEM(float41sign, MSG_CONTROL_RETRACT_RECOVER_SWAP, &fwretract.settings.swap_retract_recover_extra, -99, 99);
     #endif
-    EDIT_ITEM(float3, MSG_CONTROL_RETRACT_RECOVERF, &fwretract.settings.retract_recover_feedrate_mm_s, 1, 999);
+    EDIT_ITEM(float3, MSG_CONTROL_RETRACT_RECOVERF, &fwretract.settings.retract_recover_feedrate_mm_s, 1, 100);
     #if HAS_MULTI_EXTRUDER
-      EDIT_ITEM(float3, MSG_CONTROL_RETRACT_RECOVER_SWAPF, &fwretract.settings.swap_retract_recover_feedrate_mm_s, 1, 999);
+      EDIT_ITEM(float3, MSG_CONTROL_RETRACT_RECOVER_SWAPF, &fwretract.settings.swap_retract_recover_feedrate_mm_s, 1, 100);
     #endif
     END_MENU();
   }
 
 #endif
 
-#if HAS_PREHEAT && DISABLED(SLIM_LCD_MENUS)
+#if ENABLED(PREHEAT_SUBMENU)
+  void _menu_preheat_configuration()  {
+    #define _MINTEMP_ITEM(N) HEATER_##N##_MINTEMP,
+    #define _MAXTEMP_ITEM(N) HEATER_##N##_MAXTEMP,
+    #define MINTEMP_ALL _MIN(REPEAT(HOTENDS, _MINTEMP_ITEM) 999)
+    #define MAXTEMP_ALL _MAX(REPEAT(HOTENDS, _MAXTEMP_ITEM) 0)
+    const uint8_t m = MenuItemBase::itemIndex;
+    START_MENU();
+    STATIC_ITEM_P(ui.get_preheat_label(m), SS_DEFAULT|SS_INVERT);
+    BACK_ITEM_P(PSTR("Preheat Conf."));
+    #if HAS_FAN
+      editable.uint8 = uint8_t(ui.material_preset[m].fan_speed);
+      EDIT_ITEM_N(percent, m, MSG_FAN_SPEED, &editable.uint8, 0, 255, []{ ui.material_preset[MenuItemBase::itemIndex].fan_speed = editable.uint8; });
+    #endif
+    #if HAS_TEMP_HOTEND
+      #if ENABLED(EDITABLE_MAXTEMP)
+        EDIT_ITEM(int3, MSG_NOZZLE, &ui.material_preset[m].hotend_temp, MINTEMP_ALL, thermalManager.hotend_max_target(0));
+      #else
+        EDIT_ITEM(int3, MSG_NOZZLE, &ui.material_preset[m].hotend_temp, MINTEMP_ALL, MAXTEMP_ALL - (HOTEND_OVERSHOOT));
+      #endif
+    #endif
+    #if HAS_HEATED_BED
+      EDIT_ITEM(int3, MSG_BED, &ui.material_preset[m].bed_temp, BED_MINTEMP, BED_MAX_TARGET);
+    #endif
+    #if ENABLED(EEPROM_SETTINGS)
+      ACTION_ITEM(MSG_STORE_EEPROM, ui.store_settings);
+    #endif
+    END_MENU();
+  }
+
+  void menu_preheat_config() {
+    START_MENU();
+    BACK_ITEM(MSG_CONFIGURATION);
+    LOOP_L_N(m, PREHEAT_COUNT)
+      SUBMENU_N_S(m, ui.get_preheat_label(m), MSG_PREHEAT_M_SETTINGS, _menu_preheat_configuration);
+    
+    END_MENU();
+  }
+  
+#elif HAS_PREHEAT && DISABLED(SLIM_LCD_MENUS)
 
   void _menu_configuration_preheat_settings() {
     #define _MINTEMP_ITEM(N) HEATER_##N##_MINTEMP,
@@ -334,7 +380,11 @@ void menu_advanced_settings();
       EDIT_ITEM_N(percent, m, MSG_FAN_SPEED, &editable.uint8, 0, 255, []{ ui.material_preset[MenuItemBase::itemIndex].fan_speed = editable.uint8; });
     #endif
     #if HAS_TEMP_HOTEND
-      EDIT_ITEM(int3, MSG_NOZZLE, &ui.material_preset[m].hotend_temp, MINTEMP_ALL, MAXTEMP_ALL - (HOTEND_OVERSHOOT));
+      #if ENABLED(EDITABLE_MAXTEMP)
+        EDIT_ITEM(int3, MSG_NOZZLE, &ui.material_preset[m].hotend_temp, MINTEMP_ALL, thermalManager.hotend_max_target(0));
+      #else
+        EDIT_ITEM(int3, MSG_NOZZLE, &ui.material_preset[m].hotend_temp, MINTEMP_ALL, MAXTEMP_ALL - (HOTEND_OVERSHOOT));
+      #endif
     #endif
     #if HAS_HEATED_BED
       EDIT_ITEM(int3, MSG_BED, &ui.material_preset[m].bed_temp, BED_MINTEMP, BED_MAX_TARGET);
@@ -491,9 +541,9 @@ void menu_configuration() {
   SUBMENU(MSG_ADVANCED_SETTINGS, menu_advanced_settings);
 
   #if ENABLED(BABYSTEP_ZPROBE_OFFSET)
-    SUBMENU(MSG_ZPROBE_ZOFFSET, lcd_babystep_zoffset);
+    //SUBMENU(MSG_ZPROBE_ZOFFSET, lcd_babystep_zoffset);
   #elif HAS_BED_PROBE
-    EDIT_ITEM(LCD_Z_OFFSET_TYPE, MSG_ZPROBE_ZOFFSET, &probe.offset.z, Z_PROBE_OFFSET_RANGE_MIN, Z_PROBE_OFFSET_RANGE_MAX);
+    //EDIT_ITEM(LCD_Z_OFFSET_TYPE, MSG_ZPROBE_ZOFFSET, &probe.offset.z, Z_PROBE_OFFSET_RANGE_MIN, Z_PROBE_OFFSET_RANGE_MAX);
   #endif
 
   //
@@ -517,7 +567,7 @@ void menu_configuration() {
     #endif
 
     #if ENABLED(BLTOUCH)
-      SUBMENU(MSG_BLTOUCH, menu_bltouch);
+      if (!busy) SUBMENU(MSG_BLTOUCH, menu_bltouch);
     #endif
 
     #if ENABLED(TOUCH_MI_PROBE)
@@ -557,14 +607,16 @@ void menu_configuration() {
     EDIT_ITEM(bool, MSG_OUTAGE_RECOVERY, &recovery.enabled, recovery.changed);
   #endif
 
-  // Preheat configurations
-  #if HAS_PREHEAT && DISABLED(SLIM_LCD_MENUS)
-    LOOP_L_N(m, PREHEAT_COUNT)
-      SUBMENU_N_S(m, ui.get_preheat_label(m), MSG_PREHEAT_M_SETTINGS, _menu_configuration_preheat_settings);
-  #endif
-
   #if ENABLED(SOUND_MENU_ITEM)
     EDIT_ITEM(bool, MSG_SOUND, &ui.buzzer_enabled, []{ ui.chirp(); });
+  #endif
+
+  // Preheat configurations
+  #if ENABLED(PREHEAT_SUBMENU)
+    if (!busy)  SUBMENU_P(PSTR("Preheat Conf."), menu_preheat_config);
+  #elif HAS_PREHEAT && DISABLED(SLIM_LCD_MENUS)
+    LOOP_L_N(m, PREHEAT_COUNT)
+      if (!busy) SUBMENU_N_S(m, ui.get_preheat_label(m), MSG_PREHEAT_M_SETTINGS, _menu_configuration_preheat_settings);
   #endif
 
   #if ENABLED(EEPROM_SETTINGS)

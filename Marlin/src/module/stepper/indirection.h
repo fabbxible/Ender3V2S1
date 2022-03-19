@@ -660,7 +660,7 @@ void reset_stepper_drivers();    // Called by settings.load / settings.reset
   #define   NORM_E_DIR(E)   NOOP
   #define    REV_E_DIR(E)   NOOP
 
-#endif
+#endif\
 
 //
 // Individual stepper enable / disable macros

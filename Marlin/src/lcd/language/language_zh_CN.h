@@ -34,7 +34,7 @@ namespace Language_zh_CN {
   LSTR LANGUAGE                           = _UxGT("Simplified Chinese");
 
   LSTR WELCOME_MSG                        = MACHINE_NAME _UxGT("已就绪.");     // " ready."
-  LSTR MSG_MARLIN                         = _UxGT("马林");
+  LSTR MSG_MARLIN                         = _UxGT("Marlin");
   LSTR MSG_YES                            = _UxGT("是");
   LSTR MSG_NO                             = _UxGT("否");
   LSTR MSG_BACK                           = _UxGT("返回");     // ”Back“
@@ -55,10 +55,13 @@ namespace Language_zh_CN {
   LSTR MSG_DISABLE_STEPPERS               = _UxGT("关闭步进电机");     // "Disable steppers"
   LSTR MSG_DEBUG_MENU                     = _UxGT("调试菜单");     // "Debug Menu"
   LSTR MSG_PROGRESS_BAR_TEST              = _UxGT("进度条测试");     // "Progress Bar Test"
+  LSTR MSG_HOMING                         = _UxGT("回原点");     // "homing"
   LSTR MSG_AUTO_HOME                      = _UxGT("自动回原点");     // "Auto home"
+  LSTR MSG_AUTO_HOME_A                    = _UxGT("回 @ 原位");
   LSTR MSG_AUTO_HOME_X                    = _UxGT("回X原位");     // "Home X"
   LSTR MSG_AUTO_HOME_Y                    = _UxGT("回Y原位");     // "Home Y"
   LSTR MSG_AUTO_HOME_Z                    = _UxGT("回Z原位");     // "Home Z"
+  LSTR MSG_AUTO_MESH                      = _UxGT("自动创设网格");     // "Auto Build Mesh"
   LSTR MSG_AUTO_Z_ALIGN                   = _UxGT("自动Z对齐");
   LSTR MSG_LEVEL_BED_HOMING               = _UxGT("平台调平XYZ归原位");     // "Homing XYZ"
   LSTR MSG_LEVEL_BED_WAITING              = _UxGT("单击开始热床调平");     // "Click to Begin"
@@ -526,6 +529,7 @@ namespace Language_zh_CN {
   LSTR MSG_FILAMENT_CHANGE_NOZZLE         = _UxGT("  喷嘴: ");     // "  Nozzle: "
   LSTR MSG_RUNOUT_SENSOR                  = _UxGT("断料传感器");
   LSTR MSG_RUNOUT_DISTANCE_MM             = _UxGT("断料距离mm");
+  LSTR MSG_RUNOUT_STATE                   = _UxGT("反转断料信号"); // "Runout Sig. Inv."
   LSTR MSG_KILL_HOMING_FAILED             = _UxGT("归原位失败");     // "Homing failed"
   LSTR MSG_LCD_PROBING_FAILED             = _UxGT("探针探测失败");     // "Probing failed"
 
@@ -624,6 +628,7 @@ namespace Language_zh_CN {
   LSTR MSG_HEATER_TIMEOUT                 = _UxGT("加热器超时");
   LSTR MSG_REHEAT                         = _UxGT("重新加热");
   LSTR MSG_REHEATING                      = _UxGT("重新加热中...");
+  LSTR MSG_SOUND                          = _UxGT("Beep"); // "Sound"
 }
 
 #if FAN_COUNT == 1

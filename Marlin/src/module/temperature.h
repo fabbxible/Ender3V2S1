@@ -358,7 +358,11 @@ class Temperature {
 
     #if HAS_HOTEND
       static hotend_info_t temp_hotend[HOTENDS];
-      static const celsius_t hotend_maxtemp[HOTENDS];
+      #if ENABLED(EDITABLE_MAXTEMP)
+        static celsius_t hotend_maxtemp[HOTENDS];
+      #else
+        static const celsius_t hotend_maxtemp[HOTENDS];
+      #endif
       static inline celsius_t hotend_max_target(const uint8_t e) { return hotend_maxtemp[e] - (HOTEND_OVERSHOOT); }
     #endif
     #if HAS_HEATED_BED
@@ -518,7 +522,8 @@ class Temperature {
       static uint8_t consecutive_low_temperature_error[HOTENDS];
     #endif
 
-    #if MILLISECONDS_PREHEAT_TIME > 0
+    #if MILLISECONDS_
+    _TIME > 0
       static millis_t preheat_end_time[HOTENDS];
     #endif
 

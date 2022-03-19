@@ -233,6 +233,9 @@ typedef struct SettingsDataStruct {
   //
   bool runout_sensor_enabled;                           // M412 S
   float runout_distance_mm;                             // M412 D
+  #if HAS_FILAMENT_STATE
+    bool runout_sensor_state;
+  #endif
 
   //
   // ENABLE_LEVELING_FADE_HEIGHT
@@ -349,6 +352,12 @@ typedef struct SettingsDataStruct {
     preheat_t ui_material_preset[PREHEAT_COUNT];        // M145 S0 H B F
   #endif
 
+  //
+  // EDITABLE_MAXTEMP
+  //
+  #if ENABLED(EDITABLE_MAXTEMP)
+    celsius_t hotend_maxtemp[1];
+  #endif
   //
   // PIDTEMP
   //
@@ -767,11 +776,19 @@ void MarlinSettings::postprocess() {
     {
       #if HAS_FILAMENT_SENSOR
         const bool &runout_sensor_enabled = runout.enabled;
+        #if HAS_FILAMENT_STATE
+        const bool &runout_sensor_state = runout.state;
+        #endif
       #else
         constexpr int8_t runout_sensor_enabled = -1;
       #endif
       _FIELD_TEST(runout_sensor_enabled);
       EEPROM_WRITE(runout_sensor_enabled);
+
+      #if HAS_FILAMENT_STATE
+        _FIELD_TEST(runout_sensor_state);
+        EEPROM_WRITE(runout_sensor_state);
+      #endif
 
       #if HAS_FILAMENT_RUNOUT_DISTANCE
         const float &runout_distance_mm = runout.runout_distance();
@@ -990,6 +1007,14 @@ void MarlinSettings::postprocess() {
     #if HAS_PREHEAT
       _FIELD_TEST(ui_material_preset);
       EEPROM_WRITE(ui.material_preset);
+    #endif
+
+    //
+    // EDITABLE_MAXTEMP
+    //
+    #if ENABLED(EDITABLE_MAXTEMP)
+      _FIELD_TEST(thermalManager.hotend_maxtemp[0]);
+      EEPROM_WRITE(thermalManager.hotend_maxtemp[0]);
     #endif
 
     //
@@ -1676,6 +1701,13 @@ void MarlinSettings::postprocess() {
           runout.enabled = runout_sensor_enabled < 0 ? FIL_RUNOUT_ENABLED_DEFAULT : runout_sensor_enabled;
         #endif
 
+        #if HAS_FILAMENT_STATE
+          int8_t runout_sensor_state;
+          _FIELD_TEST(runout_sensor_state);
+          EEPROM_READ(runout_sensor_state);
+          runout.state = runout_sensor_state;
+        #endif
+
         TERN_(HAS_FILAMENT_SENSOR, if (runout.enabled) runout.reset());
 
         float runout_distance_mm;
@@ -1893,6 +1925,14 @@ void MarlinSettings::postprocess() {
       #if HAS_PREHEAT
         _FIELD_TEST(ui_material_preset);
         EEPROM_READ(ui.material_preset);
+      #endif
+
+      //
+      // EDITABLE_MAXTEMP
+      //
+      #if ENABLED(EDITABLE_MAXTEMP)
+        _FIELD_TEST(thermalManager.hotend_maxtemp[0]);
+        EEPROM_READ(thermalManager.hotend_maxtemp[0]);
       #endif
 
       //
@@ -2743,6 +2783,9 @@ void MarlinSettings::reset() {
 
   #if HAS_FILAMENT_SENSOR
     runout.enabled = FIL_RUNOUT_ENABLED_DEFAULT;
+    #if HAS_FILAMENT_STATE
+      runout.state = FIL_RUNOUT_STATE;
+    #endif
     runout.reset();
     TERN_(HAS_FILAMENT_RUNOUT_DISTANCE, runout.set_runout_distance(FILAMENT_RUNOUT_DISTANCE_MM));
   #endif
@@ -2929,6 +2972,13 @@ void MarlinSettings::reset() {
       TERN_(HAS_HEATED_BED, ui.material_preset[i].bed_temp = bpre[i]);
       TERN_(HAS_FAN,        ui.material_preset[i].fan_speed = fpre[i]);
     }
+  #endif
+
+  //
+  //  EDITABLE_MAXTEMP
+  //
+  #if ENABLED(EDITABLE_MAXTEMP)
+    thermalManager.hotend_maxtemp[0] = HEATER_0_MAXTEMP;
   #endif
 
   //

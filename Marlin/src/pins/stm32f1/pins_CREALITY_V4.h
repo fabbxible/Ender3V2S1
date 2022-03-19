@@ -35,7 +35,7 @@
   #define BOARD_INFO_NAME      "Creality V4"
 #endif
 #ifndef DEFAULT_MACHINE_NAME
-  #define DEFAULT_MACHINE_NAME "Ender 3 V2"
+  #define DEFAULT_MACHINE_NAME "Ender-3 V2"
 #endif
 
 #define BOARD_NO_NATIVE_USB
@@ -158,7 +158,7 @@
 #define NO_SD_HOST_DRIVE                          // This board's SD is only seen by the printer
 
 #if ENABLED(CR10_STOCKDISPLAY)
-
+  #define RET6_12864_LCD
   #if ENABLED(RET6_12864_LCD)
 
     // RET6 12864 LCD
@@ -174,7 +174,7 @@
       #define BEEPER_PIN                    PC6
     #endif
 
-  #elif ENABLED(VET6_12864_LCD)
+  #elif ENABLED(VET6_12864_LCD) //none available as of 20220109
 
     // VET6 12864 LCD
     #define LCD_PINS_RS                     PA4

@@ -78,7 +78,7 @@ void GcodeSuite::M303() {
   }
 
   const celsius_t temp = parser.celsiusval('S', default_temp);
-  const int c = parser.intval('C', 5);
+  const int c = parser.intval('C', 8);
   const bool u = parser.boolval('U');
 
   #if ENABLED(DWIN_CREALITY_LCD_ENHANCED)
