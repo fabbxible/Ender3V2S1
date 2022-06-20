@@ -76,14 +76,18 @@
 #define CUSTOM_VERSION_FILE Version.h // Path from the root directory (no quotes)
 //#define BL
 //#define TI
+//#define TIMOUNT //Custom titan mounting
 //#define AM
 //#define DWIN_CREALITY_LCD_ENHANCED
 //#define BL
 //#define CR10_STOCKDISPLAY
-#define EDITABLE_MAXTEMP
+#if DISABLED(ENDER3V2)
+  #define EDITABLE_MAXTEMP
+#endif
 //#define PRE
 //#define PREHEAT_SUBMENU
-//#define E5TEST
+#define option_probe
+
 
 /**
  * *** VENDORS PLEASE READ ***
@@ -616,7 +620,7 @@
 
 #if ENABLED(PIDTEMP)
   #if ENABLED(CR10_STOCKDISPLAY)
-    #define PID_EDIT_MENU         // Add PID editing to the "Advanced Settings" menu. (~700 bytes of PROGMEM)
+    //#define PID_EDIT_MENU         // Add PID editing to the "Advanced Settings" menu. (~700 bytes of PROGMEM)
     #define PID_AUTOTUNE_MENU     // Add PID auto-tuning to the "Advanced Settings" menu. (~250 bytes of PROGMEM)
   #endif
   //#define PID_PARAMS_PER_HOTEND // Uses separate PID parameters for each extruder (useful for mismatched extruders)
@@ -814,9 +818,7 @@
   #define USE_YMIN_PLUG
 #endif
 
-#if ENABLED(E5TEST)
-  #define USE_ZMAX_PLUG
-#else
+//#define USE_ZMAX_PLUG
 #define USE_ZMIN_PLUG
 //#define USE_IMIN_PLUG
 //#define USE_JMIN_PLUG
@@ -827,7 +829,6 @@
 //#define USE_IMAX_PLUG
 //#define USE_JMAX_PLUG
 //#define USE_KMAX_PLUG
-#endif
 
 // Enable pullup for all endstops to prevent a floating state
 #define ENDSTOPPULLUPS
@@ -970,6 +971,8 @@
   #define ESTEP 410
 #elif ENABLED(DG)
   #define ESTEP 140
+#elif ENABLED(option_probe)
+  #define ESTEP 424.9
 #else
   #define ESTEP 93
 #endif
@@ -980,11 +983,11 @@
  * Override with M203
  *                                      X, Y, Z [, I [, J [, K]]], E0 [, E1[, E2...]]
  */
-#define DEFAULT_MAX_FEEDRATE          { 200, 200, 15, 40 }  // MRiscoC increased Z speed, increased E speed for BMG
+#define DEFAULT_MAX_FEEDRATE          { 200, 200, 10, 40 }  // MRiscoC increased Z speed, increased E speed for BMG
 
-//#define LIMITED_MAX_FR_EDITING        // Limit edit via M203 or LCD to DEFAULT_MAX_FEEDRATE * 2
+#define LIMITED_MAX_FR_EDITING        // Limit edit via M203 or LCD to DEFAULT_MAX_FEEDRATE * 2
 #if ENABLED(LIMITED_MAX_FR_EDITING)
-  #define MAX_FEEDRATE_EDIT_VALUES    { 600, 600, 10, 50 } // ...or, set your own edit limits
+  #define MAX_FEEDRATE_EDIT_VALUES    { 300, 300, 15, 50 } // ...or, set your own edit limits
 #endif
 
 /**
@@ -993,11 +996,11 @@
  * Override with M201
  *                                      X, Y, Z [, I [, J [, K]]], E0 [, E1[, E2...]]
  */
-#define DEFAULT_MAX_ACCELERATION      { 1000, 1000, 100, 2500 }  // MRiscoC Acceleration limits increased
+#define DEFAULT_MAX_ACCELERATION      { 1000, 1000, 100, 3000 }  // MRiscoC Acceleration limits increased
 
-//#define LIMITED_MAX_ACCEL_EDITING     // Limit edit via M201 or LCD to DEFAULT_MAX_ACCELERATION * 2
+#define LIMITED_MAX_ACCEL_EDITING     // Limit edit via M201 or LCD to DEFAULT_MAX_ACCELERATION * 2
 #if ENABLED(LIMITED_MAX_ACCEL_EDITING)
-  #define MAX_ACCEL_EDIT_VALUES       { 6000, 6000, 200, 20000 } // ...or, set your own edit limits
+  #define MAX_ACCEL_EDIT_VALUES       { 3000, 3000, 200, 5000 } // ...or, set your own edit limits
 #endif
 
 /**
@@ -1009,7 +1012,7 @@
  *   M204 T    Travel Acceleration
  */
 #define DEFAULT_ACCELERATION          TERN(ENDER5, 1000, 750)    // X, Y, Z and E acceleration for printing moves  // Ender3v2 Configs
-#define DEFAULT_RETRACT_ACCELERATION  TERN(ENDER5, 1000, 750)    // E acceleration for retracts  // Ender3v2 Configs
+#define DEFAULT_RETRACT_ACCELERATION  3000    // E acceleration for retracts  // Ender3v2 Configs
 #define DEFAULT_TRAVEL_ACCELERATION   1000    // X, Y, Z acceleration for travel (non printing) moves  // Ender3v2 Configs
 
 /**
@@ -1079,9 +1082,11 @@
 #if DISABLED(BLTOUCH) && ENABLED(PROBE_MANUALLY)
   #define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN
 #else
-
-// Force the use of the probe for Z-axis homing
+  // Force the use of the probe for Z-axis homing
   #define USE_PROBE_FOR_Z_HOMING  // MRiscoC Manual mesh not have a probe
+  #if ENABLED (option_probe)
+    #undef USE_PROBE_FOR_Z_HOMING
+  #endif
 #endif
 /**
  * Z_MIN_PROBE_PIN
@@ -1229,17 +1234,25 @@
  *     |    [-]    |
  *     O-- FRONT --+
  */
-#define NOZZLE_TO_PROBE_OFFSET { TERN(AM,-47,-45.5), TERN(AM,-6,-8), -1 }  // MRiscoC Manual mesh use the nozzle as probe
+#if ENABLED(TIMOUNT)
+  #define NOZZLE_TO_PROBE_OFFSET { -20, 0, -1 } //Fabbxible titan printed mount
+#elif ENABLED(AM)
+  #define NOZZLE_TO_PROBE_OFFSET { -47, -6, -1 }
+#elif ENABLED(option_probe)
+  #define NOZZLE_TO_PROBE_OFFSET { -36.5, -40, -1 } //Sprite Extruder
+#else
+  #define NOZZLE_TO_PROBE_OFFSET { -45.5, -8, -1 }  // MRiscoC Manual mesh use the nozzle as probe
+#endif
 
 // Most probes should stay away from the edges of the bed, but
 // with NOZZLE_AS_PROBE this can be negative for a wider probing area.
-#define PROBING_MARGIN 50
+#define PROBING_MARGIN 25
 
 // X and Y axis travel speed (mm/min) between probes
 #define XY_PROBE_FEEDRATE (160*60)
 
 // Feedrate (mm/min) for the first approach when double-probing (MULTIPLE_PROBING == 2)
-#define Z_PROBE_FEEDRATE_FAST (16*60)  // MRiscoC increase probe Z speed
+#define Z_PROBE_FEEDRATE_FAST (12*60)  // MRiscoC increase probe Z speed
 
 // Feedrate (mm/min) for the "accurate" probe of each point
 #define Z_PROBE_FEEDRATE_SLOW (Z_PROBE_FEEDRATE_FAST / 2)
@@ -1314,8 +1327,8 @@
 #define Z_PROBE_LOW_POINT          -2 // Farthest distance below the trigger-point to go before stopping
 
 // For M851 give a range for adjusting the Z probe offset
-#define Z_PROBE_OFFSET_RANGE_MIN TERN(E5TEST,-20,-9)
-#define Z_PROBE_OFFSET_RANGE_MAX TERN(E5TEST,20,9)
+#define Z_PROBE_OFFSET_RANGE_MIN -9
+#define Z_PROBE_OFFSET_RANGE_MAX 9
 
 // Enable the M48 repeatability test to test probe accuracy
 #if ENABLED(BL)
@@ -1410,9 +1423,9 @@
  *  - Use a low value (i.e., Z_MIN_POS) if the nozzle falls down to the bed.
  *  - Use a large value (i.e., Z_MAX_POS) if the bed falls down, away from the nozzle.
  */
-#if ENABLED(E5TEST)
-#define Z_IDLE_HEIGHT Z_HOME_POS
-#endif
+
+//#define Z_IDLE_HEIGHT Z_HOME_POS
+
 #define Z_HOMING_HEIGHT  10      // (mm) Minimal Z height before homing (G28) for Z clearance above the bed, clamps, ...
                                   // Be sure to have this much clearance over your Z_MAX_POS to prevent grinding.
 
@@ -1422,7 +1435,7 @@
 // :[-1,1]
 #define X_HOME_DIR TERN(ENDER5, 1, -1)
 #define Y_HOME_DIR TERN(ENDER5, 1, -1)
-#define Z_HOME_DIR TERN(E5TEST, 1, -1)
+#define Z_HOME_DIR -1
 //#define I_HOME_DIR -1
 //#define J_HOME_DIR -1
 //#define K_HOME_DIR -1
@@ -1430,9 +1443,9 @@
 // @section machine
 
 #if ENABLED(ENDER3)
-#define X_BED_SIZE 230
+#define X_BED_SIZE 220
 #define Y_BED_SIZE 220
-#define X_MAX_POS 240
+#define X_MAX_POS 230
 #define Y_MAX_POS 230
 #define Z_MAX_POS 250
 #elif ENABLED(ENDER3V2)
@@ -1442,11 +1455,11 @@
 #define Y_MAX_POS 230
 #define Z_MAX_POS 250
 #elif ENABLED(ENDER5)
-#define X_BED_SIZE 230
+#define X_BED_SIZE 220
 #define Y_BED_SIZE 220
 #define X_MAX_POS X_BED_SIZE
-#define Y_MAX_POS 220
-#define Z_MAX_POS TERN(E5TEST,290,300)
+#define Y_MAX_POS Y_BED_SIZE
+#define Z_MAX_POS 300
 #elif ENABLED(ENDER2)
 #define X_BED_SIZE 165
 #define Y_BED_SIZE 165
@@ -1462,7 +1475,7 @@
 
 // Travel limits (mm) after homing, corresponding to endstop positions.
 #define X_MIN_POS 0
-#define Y_MIN_POS 0
+#define Y_MIN_POS TERN(option_probe, -10, 0)
 #define Z_MIN_POS 0
 //#define X_MAX_POS TERN(ENDER5, 230, 245)
 //#define Y_MAX_POS TERN(ENDER5, 225, 230)
@@ -1748,9 +1761,12 @@
   //===========================================================================
   //=================================== Mesh ==================================
   //===========================================================================
-
-  #define MESH_INSET PROBING_MARGIN          // Set Mesh bounds as an inset region of the bed  // MRiscoC Center mesh
-  #define GRID_MAX_POINTS_X TERN(E5TEST,2,4)    // Don't use more than 7 points per axis, implementation limited.  // MRiscoC Customizable by menu
+  #if ENABLED(TIMOUNT)
+    #define MESH_INSET 25
+  #else
+    #define MESH_INSET 25          // Set Mesh bounds as an inset region of the bed  // MRiscoC Center mesh
+  #endif
+  #define GRID_MAX_POINTS_X 4    // Don't use more than 7 points per axis, implementation limited.  // MRiscoC Customizable by menu
   #define GRID_MAX_POINTS_Y GRID_MAX_POINTS_X
 
   //#define MESH_G28_REST_ORIGIN // After homing all axes ('G28' or 'G28 XYZ') rest Z at Z_MIN_POS
@@ -1766,8 +1782,8 @@
 #endif
 #if ENABLED(LCD_BED_LEVELING)
   #define MESH_EDIT_Z_STEP  0.01 // (mm) Step size while manually probing Z axis.
-  #define LCD_PROBE_Z_RANGE TERN(E5TEST,40,4)     // (mm) Z Range centered on Z_MIN_POS for LCD Z adjustment
-  #define MESH_EDIT_MENU         // Add a menu to edit mesh points
+  #define LCD_PROBE_Z_RANGE 4     // (mm) Z Range centered on Z_MIN_POS for LCD Z adjustment
+  //#define MESH_EDIT_MENU         // Add a menu to edit mesh points
 #endif
 
 // Add a menu item to move between bed corners for manual bed adjustment
@@ -1775,13 +1791,17 @@
   #define LEVEL_BED_CORNERS
 #endif
 #if ENABLED(LEVEL_BED_CORNERS)
-  #define LEVEL_CORNERS_INSET_LFRB { PROBING_MARGIN, PROBING_MARGIN, PROBING_MARGIN, PROBING_MARGIN } // (mm) Left, Front, Right, Back insets
+  #if ENABLED(TIMOUNT)
+    #define LEVEL_CORNERS_INSET_LFRB { 25, 25, 25, 25 }
+  #else
+    #define LEVEL_CORNERS_INSET_LFRB { PROBING_MARGIN, PROBING_MARGIN, PROBING_MARGIN, PROBING_MARGIN } // (mm) Left, Front, Right, Back insets
+  #endif
   #define LEVEL_CORNERS_HEIGHT      0.0   // (mm) Z height of nozzle at leveling points
   #define LEVEL_CORNERS_Z_HOP       4.0   // (mm) Z height of nozzle between leveling points
   //#define LEVEL_CENTER_TOO              // Move to the center after the last corner
 
   #if ENABLED(BL)
-    #define LEVEL_CORNERS_USE_PROBE
+    //#define LEVEL_CORNERS_USE_PROBE
   #endif
   #if ENABLED(LEVEL_CORNERS_USE_PROBE)
     #define LEVEL_CORNERS_PROBE_TOLERANCE 0.1
@@ -1838,6 +1858,9 @@
  */
 #if ENABLED(BL)
   #define Z_SAFE_HOMING
+  #if ENABLED(option_probe)
+    #undef Z_SAFE_HOMING
+  #endif
 #endif
 
 #if ENABLED(Z_SAFE_HOMING)
@@ -1846,7 +1869,7 @@
 #endif
 
 // Homing speeds (mm/min)
-#define HOMING_FEEDRATE_MM_M { (60*60), (60*60), (TERN(BL,16,8)*60) }  // MRiscoC Homming speed-up
+#define HOMING_FEEDRATE_MM_M { (60*60), (60*60), (TERN(BL,12,8)*60) }  // MRiscoC Homming speed-up
 
 // Validate that endstops are triggered on homing moves
 #define VALIDATE_HOMING_ENDSTOPS

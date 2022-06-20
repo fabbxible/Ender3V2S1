@@ -339,6 +339,8 @@ void menu_info() {
     #endif
   #endif
 
+  GCODES_ITEM(MSG_MEDIA_UPDATE, PSTR("M997"));
+
   END_MENU();
 }
 

@@ -386,6 +386,10 @@ void menu_main() {
       GCODES_ITEM(MSG_SWITCH_PS_ON, PSTR("M80"));
   #endif
 
+  #if HAS_MULTI_LANGUAGE
+    SUBMENU(LANGUAGE, menu_language);
+  #endif
+
   #if ENABLED(SDSUPPORT) && DISABLED(MEDIA_MENU_AT_TOP)
     sdcard_menu_items();
   #endif
@@ -444,9 +448,9 @@ void menu_main() {
     }
   #endif
 
-  #if HAS_MULTI_LANGUAGE
-    SUBMENU(LANGUAGE, menu_language);
-  #endif
+  // #if HAS_MULTI_LANGUAGE
+  //   SUBMENU(LANGUAGE, menu_language);
+  // #endif
 
   #if ENABLED(HOST_SHUTDOWN_MENU_ITEM) && defined(SHUTDOWN_ACTION)
     SUBMENU(MSG_HOST_SHUTDOWN, []{
