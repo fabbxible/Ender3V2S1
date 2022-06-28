@@ -9,3 +9,64 @@ TODO
 8. e3v2 add printing acceleration menu
 9. e3v2 add preheat submenu
 10. editable max temp (lcd added)
+
+LCD Menu Structure
+-During printing (main status screen)
+--(return to Info)
+--Pause print
+--Stop print
+--Tune
+  -(return to main)
+  -speed
+  -nozzle
+  -bed
+  -fan speed
+  -flow
+  -probe z offset/babystep
+  -Cancel Object*
+  -retract*
+    -(return to Tune)
+    -auto-retract *rename to Override 
+    -retract mm
+    -retract v
+    -hop mm
+    -unretr. mm
+    -unretract v
+--Cancel Object (hide)*
+--Temperature (hide)*
+--Configuration (hide)*
+--Change Filament
+--About Printer (hide)*
+--language (hide)*
+
+Not printing
+(Info Screen)
+preheat
+motion
+Temperature
+-(return to main)
+-nozzle
+-bed
+-fan speed
+-preheat N
+-cool down
+-*Temperature Calibration
+--(return to tune)
+--PID Autotune E1
+--PID Autotune Bed
+Configuration
+-(return to main)
+-Advanced Settings
+-Retract
+-Runout Sensor
+-Power Outage
+-Sound
+-Preheat N Conf
+-Store Settings
+-Load Settings
+-Restore Defaults
+change Filament
+About Printer
+English
+Change Media
+Print From Media

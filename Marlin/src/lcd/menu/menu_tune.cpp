@@ -42,6 +42,38 @@
   #include "../../feature/bedlevel/bedlevel.h"
 #endif
 
+#if ENABLED(FWRETRACT)
+
+  #include "../../feature/fwretract.h"
+
+  void menu_tune_retract() {
+    START_MENU();
+    BACK_ITEM(MSG_TUNE);
+    #if ENABLED(FWRETRACT_AUTORETRACT)
+      EDIT_ITEM(bool, MSG_AUTORETRACT, &fwretract.autoretract_enabled, fwretract.refresh_autoretract);
+    #endif
+    EDIT_ITEM(float41sign, MSG_CONTROL_RETRACT, &fwretract.settings.retract_length, 0, 99);
+    #if HAS_MULTI_EXTRUDER
+      EDIT_ITEM(float41sign, MSG_CONTROL_RETRACT_SWAP, &fwretract.settings.swap_retract_length, 0, 99);
+    #endif
+    EDIT_ITEM(float3, MSG_CONTROL_RETRACTF, &fwretract.settings.retract_feedrate_mm_s, 1, 100);
+    EDIT_ITEM(float41sign, MSG_CONTROL_RETRACT_ZHOP, &fwretract.settings.retract_zraise, 0, 99);
+    EDIT_ITEM(float41sign, MSG_CONTROL_RETRACT_RECOVER, &fwretract.settings.retract_recover_extra, -99, 99);
+    #if HAS_MULTI_EXTRUDER
+      EDIT_ITEM(float41sign, MSG_CONTROL_RETRACT_RECOVER_SWAP, &fwretract.settings.swap_retract_recover_extra, -99, 99);
+    #endif
+    EDIT_ITEM(float3, MSG_CONTROL_RETRACT_RECOVERF, &fwretract.settings.retract_recover_feedrate_mm_s, 1, 100);
+    #if HAS_MULTI_EXTRUDER
+      EDIT_ITEM(float3, MSG_CONTROL_RETRACT_RECOVER_SWAPF, &fwretract.settings.swap_retract_recover_feedrate_mm_s, 1, 100);
+    #endif
+    END_MENU();
+  }
+
+#endif
+#if ENABLED(CANCEL_OBJECTS)
+  void menu_cancelobject();
+#endif
+
 #if ENABLED(BABYSTEPPING)
 
   #include "../../feature/babystep.h"
@@ -118,7 +150,7 @@ void menu_tune() {
   // Manual bed leveling, Bed Z:
   //
   #if BOTH(MESH_BED_LEVELING, LCD_BED_LEVELING)
-    EDIT_ITEM(float43, MSG_BED_Z, &mbl.z_offset, -1, 1);
+    //EDIT_ITEM(float43, MSG_BED_Z, &mbl.z_offset, -1, 1);
   #endif
 
   //
@@ -231,6 +263,14 @@ void menu_tune() {
     #else
       SUBMENU(MSG_BABYSTEP_Z, lcd_babystep_z);
     #endif
+  #endif
+
+  #if ENABLED(FWRETRACT)
+    SUBMENU(MSG_RETRACT, menu_tune_retract);
+  #endif
+
+  #if ENABLED(CANCEL_OBJECTS) && DISABLED(SLIM_LCD_MENUS)
+    SUBMENU(MSG_CANCEL_OBJECT, []{ editable.int8 = -1; ui.goto_screen(menu_cancelobject); });
   #endif
 
   END_MENU();

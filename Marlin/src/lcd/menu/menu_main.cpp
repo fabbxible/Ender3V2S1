@@ -294,7 +294,7 @@ void menu_main() {
     SUBMENU(MSG_TUNE, menu_tune);
 
     #if ENABLED(CANCEL_OBJECTS) && DISABLED(SLIM_LCD_MENUS)
-      SUBMENU(MSG_CANCEL_OBJECT, []{ editable.int8 = -1; ui.goto_screen(menu_cancelobject); });
+      //SUBMENU(MSG_CANCEL_OBJECT, []{ editable.int8 = -1; ui.goto_screen(menu_cancelobject); });
     #endif
   }
   else {
@@ -311,7 +311,7 @@ void menu_main() {
     #endif
 
     #if ENABLED(PREHEAT_SHORTCUT_MENU_ITEM)
-      SUBMENU(MSG_PREHEAT_CUSTOM, menu_preheat_only);
+      SUBMENU(MSG_PREHEAT_MENU, menu_preheat_only);
     #endif
 
     SUBMENU(MSG_MOTION, menu_motion);
@@ -322,7 +322,7 @@ void menu_main() {
   #endif
 
   #if HAS_TEMPERATURE
-    SUBMENU(MSG_TEMPERATURE, menu_temperature);
+    if(!busy) SUBMENU(MSG_TEMPERATURE, menu_temperature);
   #endif
 
   #if HAS_POWER_MONITOR
@@ -337,7 +337,7 @@ void menu_main() {
     if (!busy) SUBMENU(MSG_MMU2_MENU, menu_mmu2);
   #endif
 
-  SUBMENU(MSG_CONFIGURATION, menu_configuration);
+  if(!busy) SUBMENU(MSG_CONFIGURATION, menu_configuration);
 
   #if ENABLED(CUSTOM_MENU_MAIN)
     if (TERN1(CUSTOM_MENU_MAIN_ONLY_IDLE, !busy)) {
@@ -361,7 +361,7 @@ void menu_main() {
   #endif
 
   #if ENABLED(LCD_INFO_MENU)
-    SUBMENU(MSG_INFO_MENU, menu_info);
+    if(!busy) SUBMENU(MSG_INFO_MENU, menu_info);
   #endif
 
   #if EITHER(LED_CONTROL_MENU, CASE_LIGHT_MENU)
@@ -387,7 +387,7 @@ void menu_main() {
   #endif
 
   #if HAS_MULTI_LANGUAGE
-    SUBMENU(LANGUAGE, menu_language);
+    if(!busy) SUBMENU(LANGUAGE, menu_language);
   #endif
 
   #if ENABLED(SDSUPPORT) && DISABLED(MEDIA_MENU_AT_TOP)

@@ -280,6 +280,7 @@ void menu_temperature() {
     //
     // Cooldown
     //
+    
     if (TERN0(HAS_HEATED_BED, thermalManager.degTargetBed())) has_heat = true;
     if (has_heat) ACTION_ITEM(MSG_COOLDOWN, lcd_cooldown);
   #endif
@@ -301,6 +302,15 @@ void menu_temperature() {
         ACTION_ITEM_S(ui.get_preheat_label(m), MSG_PREHEAT_M, do_preheat_end_m);
       #endif
     }
+
+    #if HAS_TEMP_HOTEND || HAS_HEATED_BED
+    //
+    // Cooldown
+    //
+      bool has_heat = false;
+      if (TERN0(HAS_HEATED_BED, thermalManager.degTargetBed())) has_heat = true;
+      if (has_heat) ACTION_ITEM(MSG_COOLDOWN, lcd_cooldown);
+    #endif
 
     END_MENU();
   }

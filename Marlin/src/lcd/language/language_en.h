@@ -129,6 +129,7 @@ namespace Language_en {
     LSTR MSG_PREHEAT_M_SETTINGS           = _UxGT("Preheat $ Conf");
   #endif
   LSTR MSG_PREHEAT_CUSTOM                 = _UxGT("Preheat Custom");
+  LSTR MSG_PREHEAT_MENU                   = _UxGT("Preheat");
   LSTR MSG_COOLDOWN                       = _UxGT("Cooldown");
 
   LSTR MSG_CUTTER_FREQUENCY               = _UxGT("Frequency");
@@ -391,6 +392,7 @@ namespace Language_en {
   LSTR MSG_E_STEPS                        = _UxGT("E steps/mm");
   LSTR MSG_EN_STEPS                       = _UxGT("* Steps/mm");
   LSTR MSG_TEMPERATURE                    = _UxGT("Temperature");
+  LSTR MSG_TEMPERATURE_CALIBRATION        = _UxGT("Temperature Calibration");
   LSTR MSG_MOTION                         = _UxGT("Motion");
   LSTR MSG_FILAMENT                       = _UxGT("Filament");
   LSTR MSG_VOLUMETRIC_ENABLED             = _UxGT("E in mm") SUPERSCRIPT_THREE;

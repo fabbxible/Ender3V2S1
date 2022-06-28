@@ -541,26 +541,32 @@ void menu_backlash();
     //ACTION_ITEM_P(PSTR("BMG Extruder"), []{ gcode.process_subcommands_now(F("M92E415")); ui.goto_previous_screen(); });
     CONFIRM_ITEM_P(PSTR("Stock Extruder"),
       MSG_BUTTON_NEXT, MSG_BUTTON_BACK,
-      []{gcode.process_subcommands_now(F("M92E93M500")); ui.goto_previous_screen(); ui.goto_previous_screen();}, ui.goto_previous_screen,
-      GET_TEXT(MSG_E_STEPS), PSTR("Will be set to 93"), PSTR("For Stock Extruder")
+      []{gcode.process_subcommands_now(F("M92E93\nM500")); ui.goto_previous_screen(); ui.goto_previous_screen();}, ui.goto_previous_screen,
+      GET_TEXT(MSG_E_STEPS), PSTR("Will be set to 93 "), PSTR("for Stock Extruder")
     );
 
     CONFIRM_ITEM_P(PSTR("Dual-Gear Extruder"),
       MSG_BUTTON_NEXT, MSG_BUTTON_BACK,
-      []{gcode.process_subcommands_now(F("M92E140M500")); ui.goto_previous_screen(); ui.goto_previous_screen();}, ui.goto_previous_screen,
-      GET_TEXT(MSG_E_STEPS), PSTR("Will be set to 140"), PSTR("For Dual-Gear Extruder")
+      []{gcode.process_subcommands_now(F("M92E140\nM500")); ui.goto_previous_screen(); ui.goto_previous_screen();}, ui.goto_previous_screen,
+      GET_TEXT(MSG_E_STEPS), PSTR("Will be set to 140 "), PSTR("for Dual-Gear Extruder")
     );
 
     CONFIRM_ITEM_P(PSTR("E3D Titan Extruder"),
       MSG_BUTTON_NEXT, MSG_BUTTON_BACK,
-      []{gcode.process_subcommands_now(F("M92E410M500")); ui.goto_previous_screen(); ui.goto_previous_screen();}, ui.goto_previous_screen,
-      GET_TEXT(MSG_E_STEPS), PSTR("Will be set to 410"), PSTR("For E3D Titan Extruder")
+      []{gcode.process_subcommands_now(F("M92E410\nM500")); ui.goto_previous_screen(); ui.goto_previous_screen();}, ui.goto_previous_screen,
+      GET_TEXT(MSG_E_STEPS), PSTR("Will be set to 410 "), PSTR("for Titan Extruder")
     );
 
     CONFIRM_ITEM_P(PSTR("BMG Extruder"),
       MSG_BUTTON_NEXT, MSG_BUTTON_BACK,
-      []{gcode.process_subcommands_now(F("M92E415M500")); ui.goto_previous_screen(); ui.goto_previous_screen();}, ui.goto_previous_screen,
-      GET_TEXT(MSG_E_STEPS), PSTR("Will be set to 415"), PSTR("For BMG Extruder")
+      []{gcode.process_subcommands_now(F("M92E415\nM500")); ui.goto_previous_screen(); ui.goto_previous_screen();}, ui.goto_previous_screen,
+      GET_TEXT(MSG_E_STEPS), PSTR("Will be set to 415 "), PSTR("for BMG Extruder")
+    );
+
+    CONFIRM_ITEM_P(PSTR("Sprite Extruder"),
+      MSG_BUTTON_NEXT, MSG_BUTTON_BACK,
+      []{gcode.process_subcommands_now(F("M92E424\nM500")); ui.goto_previous_screen(); ui.goto_previous_screen();}, ui.goto_previous_screen,
+      GET_TEXT(MSG_E_STEPS), PSTR("Will be set to 424 "), PSTR("for Sprite Extruder")
     );
     END_MENU();
   }
@@ -587,8 +593,8 @@ void menu_advanced_steps_per_mm() {
           planner.mm_per_step[E_AXIS_N(e)] = 1.0f / planner.settings.axis_steps_per_mm[E_AXIS_N(e)];
       });
   #elif E_STEPPERS
-    EDIT_ITEM_FAST(float51, MSG_E_STEPS, &planner.settings.axis_steps_per_mm[E_AXIS], 5, 9999, []{ planner.refresh_positioning(); });
     SUBMENU_P(PSTR("Extruder Preset"), menu_extruder_preset);
+    EDIT_ITEM_FAST(float51, MSG_E_STEPS, &planner.settings.axis_steps_per_mm[E_AXIS], 5, 9999, []{ planner.refresh_positioning(); });
   #endif
 
   END_MENU();

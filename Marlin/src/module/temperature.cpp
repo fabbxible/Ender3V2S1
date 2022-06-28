@@ -806,8 +806,11 @@ volatile bool Temperature::raw_temps_ready = false;
         #endif
 
         // Use the result? (As with "M303 U1")
-        if (set_result)
+        if (set_result) {
           GHV(_set_chamber_pid(tune_pid), _set_bed_pid(tune_pid), _set_hotend_pid(heater_id, tune_pid));
+          ui.store_settings();
+        }
+
 
         TERN_(PRINTER_EVENT_LEDS, printerEventLEDs.onPidTuningDone(color));
 

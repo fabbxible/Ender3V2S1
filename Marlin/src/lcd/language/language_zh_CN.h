@@ -89,6 +89,7 @@ namespace Language_zh_CN {
     LSTR MSG_PREHEAT_M_SETTINGS           = _UxGT("预热 $ 设置");     //MSG_PREHEAT_1 " conf"
   #endif
   LSTR MSG_PREHEAT_CUSTOM                 = _UxGT("预热自定义");
+  LSTR MSG_PREHEAT_MENU                   = _UxGT("预热");
   LSTR MSG_COOLDOWN                       = _UxGT("降温");     // "Cooldown"
   LSTR MSG_CUTTER_FREQUENCY               = _UxGT("切割频率");
   LSTR MSG_LASER_MENU                     = _UxGT("激光控制");
@@ -312,6 +313,7 @@ namespace Language_zh_CN {
   LSTR MSG_E_STEPS                        = _UxGT("E 步数/mm");     // "Esteps/mm"
   LSTR MSG_EN_STEPS                       = _UxGT("* 步数/mm");
   LSTR MSG_TEMPERATURE                    = _UxGT("温度");     // "Temperature"
+  LSTR MSG_TEMPERATURE_CALIBRATION        = _UxGT("温度校准");     // "Temperature Calibration"
   LSTR MSG_MOTION                         = _UxGT("运动");     // "Motion"
   LSTR MSG_FILAMENT                       = _UxGT("料丝");     // "Filament" menu_advanced_filament
   LSTR MSG_VOLUMETRIC_ENABLED             = _UxGT("E 在 mm") SUPERSCRIPT_THREE;     // "E in mm3" volumetric_enabled

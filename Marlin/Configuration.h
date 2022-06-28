@@ -74,19 +74,19 @@
 // Author info of this build printed to the host during boot and M115
 #define STRING_CONFIG_H_AUTHOR "Season, Fabbxible" // Who made the changes.
 #define CUSTOM_VERSION_FILE Version.h // Path from the root directory (no quotes)
-//#define BL
-//#define TI
+
+//#define TI //Titan direct extruder
 //#define TIMOUNT //Custom titan mounting
-//#define AM
+//#define AM // All metal hotned
 //#define DWIN_CREALITY_LCD_ENHANCED
-//#define BL
+//#define BL //Bltouch
 //#define CR10_STOCKDISPLAY
 #if DISABLED(ENDER3V2)
   #define EDITABLE_MAXTEMP
 #endif
 //#define PRE
 //#define PREHEAT_SUBMENU
-#define option_probe
+//#define SPRITE // Creality Sprite Extruder Pro 300C
 
 
 /**
@@ -586,7 +586,12 @@
 // Above this temperature the heater will be switched off.
 // This can protect components from overheating, but NOT from shorts and failures.
 // (Use MINTEMP for thermistor short/failure protection.)
-#define HEATER_0_MAXTEMP TERN(AM,320,280)
+#if ANY(AM,SPRITE)
+  #define HEATER_0_MAXTEMP 320
+#else
+  #define HEATER_0_MAXTEMP 280
+#endif
+//#define HEATER_0_MAXTEMP TERN((AM||SPRITE),320,280)
 #define HEATER_1_MAXTEMP 275
 #define HEATER_2_MAXTEMP 275
 #define HEATER_3_MAXTEMP 275
@@ -633,9 +638,18 @@
     #define DEFAULT_Ki_LIST {   1.08,   1.08 }
     #define DEFAULT_Kd_LIST { 114.00, 114.00 }
   #else
-    #define DEFAULT_Kp  TERN(AM, 19.01, 29.88)  // 240C Creality High temperature ; Hotend 210c Stock Ender3v2 PID
-    #define DEFAULT_Ki  TERN(AM, 1.61, 3.06)
-    #define DEFAULT_Kd  TERN(AM, 56.28, 72.91)
+    #if ANY(AM, SPRITE)
+      #define DEFAULT_Kp  19.01  // 240C Creality High temperature
+      #define DEFAULT_Ki  1.61
+      #define DEFAULT_Kd  56.28
+    #else
+      #define DEFAULT_Kp  29.88  // Hotend 210c Stock Ender3v2 PID
+      #define DEFAULT_Ki  3.06
+      #define DEFAULT_Kd  72.91
+    #endif
+    //#define DEFAULT_Kp  TERN((AM||SPRITE), 19.01, 29.88)  // 240C Creality High temperature ; Hotend 210c Stock Ender3v2 PID
+    //#define DEFAULT_Ki  TERN((AM||SPRITE), 1.61, 3.06)
+    //#define DEFAULT_Kd  TERN((AM||SPRITE), 56.28, 72.91)
   #endif
 #endif // PIDTEMP
 
@@ -971,8 +985,8 @@
   #define ESTEP 410
 #elif ENABLED(DG)
   #define ESTEP 140
-#elif ENABLED(option_probe)
-  #define ESTEP 424.9
+#elif ENABLED(SPRITE)
+  #define ESTEP 424
 #else
   #define ESTEP 93
 #endif
@@ -1011,7 +1025,7 @@
  *   M204 R    Retract Acceleration
  *   M204 T    Travel Acceleration
  */
-#define DEFAULT_ACCELERATION          TERN(ENDER5, 1000, 750)    // X, Y, Z and E acceleration for printing moves  // Ender3v2 Configs
+#define DEFAULT_ACCELERATION          1000    // X, Y, Z and E acceleration for printing moves  // Ender3v2 Configs
 #define DEFAULT_RETRACT_ACCELERATION  3000    // E acceleration for retracts  // Ender3v2 Configs
 #define DEFAULT_TRAVEL_ACCELERATION   1000    // X, Y, Z acceleration for travel (non printing) moves  // Ender3v2 Configs
 
@@ -1084,9 +1098,7 @@
 #else
   // Force the use of the probe for Z-axis homing
   #define USE_PROBE_FOR_Z_HOMING  // MRiscoC Manual mesh not have a probe
-  #if ENABLED (option_probe)
-    #undef USE_PROBE_FOR_Z_HOMING
-  #endif
+
 #endif
 /**
  * Z_MIN_PROBE_PIN
@@ -1238,7 +1250,7 @@
   #define NOZZLE_TO_PROBE_OFFSET { -20, 0, -1 } //Fabbxible titan printed mount
 #elif ENABLED(AM)
   #define NOZZLE_TO_PROBE_OFFSET { -47, -6, -1 }
-#elif ENABLED(option_probe)
+#elif ENABLED(SPRITE)
   #define NOZZLE_TO_PROBE_OFFSET { -36.5, -40, -1 } //Sprite Extruder
 #else
   #define NOZZLE_TO_PROBE_OFFSET { -45.5, -8, -1 }  // MRiscoC Manual mesh use the nozzle as probe
@@ -1246,7 +1258,7 @@
 
 // Most probes should stay away from the edges of the bed, but
 // with NOZZLE_AS_PROBE this can be negative for a wider probing area.
-#define PROBING_MARGIN 25
+#define PROBING_MARGIN 15
 
 // X and Y axis travel speed (mm/min) between probes
 #define XY_PROBE_FEEDRATE (160*60)
@@ -1475,7 +1487,7 @@
 
 // Travel limits (mm) after homing, corresponding to endstop positions.
 #define X_MIN_POS 0
-#define Y_MIN_POS TERN(option_probe, -10, 0)
+#define Y_MIN_POS TERN(SPRITE, -10, 0)
 #define Z_MIN_POS 0
 //#define X_MAX_POS TERN(ENDER5, 230, 245)
 //#define Y_MAX_POS TERN(ENDER5, 225, 230)
@@ -1726,7 +1738,7 @@
     // Experimental Subdivision of the grid by Catmull-Rom method.
     // Synthesizes intermediate points to produce a more detailed mesh.
     //
-    #define ABL_BILINEAR_SUBDIVISION
+    //#define ABL_BILINEAR_SUBDIVISION
     #if ENABLED(ABL_BILINEAR_SUBDIVISION)
       // Number of subdivisions between probe points
       #define BILINEAR_SUBDIVISIONS 3
@@ -1791,11 +1803,7 @@
   #define LEVEL_BED_CORNERS
 #endif
 #if ENABLED(LEVEL_BED_CORNERS)
-  #if ENABLED(TIMOUNT)
-    #define LEVEL_CORNERS_INSET_LFRB { 25, 25, 25, 25 }
-  #else
-    #define LEVEL_CORNERS_INSET_LFRB { PROBING_MARGIN, PROBING_MARGIN, PROBING_MARGIN, PROBING_MARGIN } // (mm) Left, Front, Right, Back insets
-  #endif
+  #define LEVEL_CORNERS_INSET_LFRB { PROBING_MARGIN, PROBING_MARGIN, PROBING_MARGIN, PROBING_MARGIN } // (mm) Left, Front, Right, Back insets
   #define LEVEL_CORNERS_HEIGHT      0.0   // (mm) Z height of nozzle at leveling points
   #define LEVEL_CORNERS_Z_HOP       4.0   // (mm) Z height of nozzle between leveling points
   //#define LEVEL_CENTER_TOO              // Move to the center after the last corner
@@ -1858,9 +1866,6 @@
  */
 #if ENABLED(BL)
   #define Z_SAFE_HOMING
-  #if ENABLED(option_probe)
-    #undef Z_SAFE_HOMING
-  #endif
 #endif
 
 #if ENABLED(Z_SAFE_HOMING)
@@ -1981,21 +1986,24 @@
 // Preheat Constants - Up to 5 are supported without changes
 //
 #define PREHEAT_1_LABEL       "PLA"
-#define PREHEAT_1_TEMP_HOTEND 195
+#define PREHEAT_1_TEMP_HOTEND 200
 #define PREHEAT_1_TEMP_BED     60
-#define PREHEAT_1_TEMP_CHAMBER 35
 #define PREHEAT_1_FAN_SPEED   255 // Value from 0 to 255
 
 #define PREHEAT_2_LABEL       "ABS"
 #define PREHEAT_2_TEMP_HOTEND 240
-#define PREHEAT_2_TEMP_BED    100
-#define PREHEAT_2_TEMP_CHAMBER 35
-#define PREHEAT_2_FAN_SPEED   128 // Value from 0 to 255
+#define PREHEAT_2_TEMP_BED    105
+#define PREHEAT_2_FAN_SPEED     0 // Value from 0 to 255
 
-#define PREHEAT_3_LABEL       "CUSTOM"
-#define PREHEAT_3_TEMP_HOTEND 230
+#define PREHEAT_3_LABEL       "PETG"
+#define PREHEAT_3_TEMP_HOTEND 235
 #define PREHEAT_3_TEMP_BED     80
 #define PREHEAT_3_FAN_SPEED   128
+
+#define PREHEAT_4_LABEL       "Nozzle Swap"
+#define PREHEAT_4_TEMP_HOTEND 305
+#define PREHEAT_4_TEMP_BED      0
+#define PREHEAT_4_FAN_SPEED     0
 
 /**
  * Nozzle Park

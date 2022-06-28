@@ -1350,7 +1350,7 @@
   #endif
 
   // Insert a menu for preheating at the top level to allow for quick access
-  //#define PREHEAT_SHORTCUT_MENU_ITEM
+  #define PREHEAT_SHORTCUT_MENU_ITEM
 
 #endif // HAS_LCD_MENU
 
@@ -1967,7 +1967,7 @@
     #endif
   #endif
 
-  //#define BABYSTEP_DISPLAY_TOTAL          // Display total babysteps since last G28
+  #define BABYSTEP_DISPLAY_TOTAL          // Display total babysteps since last G28
   #if ENABLED(BL)
   #define BABYSTEP_ZPROBE_OFFSET          // Combine M851 Z and Babystepping
   #endif
@@ -2390,9 +2390,16 @@
     #define MIN_AUTORETRACT             0.2 // (mm) Don't convert E moves under this length
     #define MAX_AUTORETRACT            10.0 // (mm) Don't convert E moves over this length
   #endif
-  #define RETRACT_LENGTH               TERN(TI,3,6)   // (mm) Default retract length (positive value)
+
+  #if ANY(TI, SPRITE)
+    #define RETRACT_LENGTH  2
+  #else
+    #define RETRACT_LENGTH  5
+  #endif
+
+  //#define RETRACT_LENGTH               TERN((#TI||SPRITE),2,5)   // (mm) Default retract length (positive value)
   #define RETRACT_LENGTH_SWAP          13   // (mm) Default swap retract length (positive value)
-  #define RETRACT_FEEDRATE             40   // (mm/s) Default feedrate for retracting
+  #define RETRACT_FEEDRATE             35   // (mm/s) Default feedrate for retracting
   #define RETRACT_ZRAISE                0   // (mm) Default retract Z-raise
   #define RETRACT_RECOVER_LENGTH        0   // (mm) Default additional recover length (added to retract length on recover)
   #define RETRACT_RECOVER_LENGTH_SWAP   0   // (mm) Default additional swap recover length (added to retract length on recover from toolchange)

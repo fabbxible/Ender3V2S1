@@ -70,6 +70,8 @@
     #define var4 "ti"
 #elif ENABLED(DG)
     #define var4 "dg"
+#elif ENABLED(SPRITE)
+    #define var4 "sp"
 #else
     #define var4 ""
 #endif
