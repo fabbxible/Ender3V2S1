@@ -638,10 +638,14 @@
     #define DEFAULT_Ki_LIST {   1.08,   1.08 }
     #define DEFAULT_Kd_LIST { 114.00, 114.00 }
   #else
-    #if ANY(AM, SPRITE)
+    #if ENABLED (AM)
       #define DEFAULT_Kp  19.01  // 240C Creality High temperature
       #define DEFAULT_Ki  1.61
       #define DEFAULT_Kd  56.28
+    #elif ENABLED(SPRITE)
+      #define DEFAULT_Kp  27.05  // 210C Sprite Pro
+      #define DEFAULT_Ki  2.84
+      #define DEFAULT_Kd  64.37
     #else
       #define DEFAULT_Kp  29.88  // Hotend 210c Stock Ender3v2 PID
       #define DEFAULT_Ki  3.06
@@ -1457,15 +1461,17 @@
 #if ENABLED(ENDER3)
 #define X_BED_SIZE 220
 #define Y_BED_SIZE 220
-#define X_MAX_POS 230
-#define Y_MAX_POS 230
+#define X_MAX_POS 220
+#define Y_MAX_POS 220
 #define Z_MAX_POS 250
+#define Y_MIN_POS TERN(SPRITE,-10,0)
 #elif ENABLED(ENDER3V2)
-#define X_BED_SIZE 230
+#define X_BED_SIZE 220
 #define Y_BED_SIZE 220
-#define X_MAX_POS 245
-#define Y_MAX_POS 230
+#define X_MAX_POS 220
+#define Y_MAX_POS 220
 #define Z_MAX_POS 250
+#define Y_MIN_POS 0
 #elif ENABLED(ENDER5)
 #define X_BED_SIZE 220
 #define Y_BED_SIZE 220
@@ -1487,7 +1493,9 @@
 
 // Travel limits (mm) after homing, corresponding to endstop positions.
 #define X_MIN_POS 0
-#define Y_MIN_POS TERN(SPRITE, -10, 0)
+#ifndef Y_MIN_POS
+  #define Y_MIN_POS 0
+#endif
 #define Z_MIN_POS 0
 //#define X_MAX_POS TERN(ENDER5, 230, 245)
 //#define Y_MAX_POS TERN(ENDER5, 225, 230)

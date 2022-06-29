@@ -808,7 +808,9 @@ volatile bool Temperature::raw_temps_ready = false;
         // Use the result? (As with "M303 U1")
         if (set_result) {
           GHV(_set_chamber_pid(tune_pid), _set_bed_pid(tune_pid), _set_hotend_pid(heater_id, tune_pid));
+          #if DISABLED(ENDER3V2)
           ui.store_settings();
+          #endif
         }
 
 
